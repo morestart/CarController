@@ -1,14 +1,12 @@
-<<<<<<< Updated upstream
-=======
 import 'package:car/btn_data_operation.dart';
 import 'package:car/server_data_operation.dart';
->>>>>>> Stashed changes
 import 'package:flustars/flustars.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   SystemChrome.setPreferredOrientations(
@@ -28,11 +26,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String recv = '';
   String timeNow = '';
-<<<<<<< Updated upstream
-
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-=======
   String _ip = '192.168.4.1';
   String _port = '8000';
   String _topData = 'top';
@@ -58,7 +51,6 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
->>>>>>> Stashed changes
   @override
   void initState() {
     super.initState();
@@ -141,18 +133,6 @@ class _MyAppState extends State<MyApp> {
   Widget _myPopMenu() {
     return PopupMenuButton<String>(
         itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-<<<<<<< Updated upstream
-              PopupMenuItem<String>(value: 'addConfig', child: new Text('添加配置')),
-              PopupMenuItem<String>(value: 'removeConfig', child: new Text('删除配置')),
-            ],
-        onSelected: (String value) {
-          if (value == 'addConfig')
-          {
-            print('add');
-          }
-          else if (value == 'removeConfig')
-          {
-=======
               PopupMenuItem<String>(
                   value: 'addConfig', child: new Text('添加服务端配置')),
               PopupMenuItem<String>(
@@ -167,7 +147,6 @@ class _MyAppState extends State<MyApp> {
             readData();
           } else if (value == 'removeConfig') {
             removeData();
->>>>>>> Stashed changes
             print('remove');
           } else if (value == 'addBtnData') {
             Navigator.of(context).push(MaterialPageRoute(
@@ -178,8 +157,6 @@ class _MyAppState extends State<MyApp> {
         });
   }
 
-<<<<<<< Updated upstream
-=======
   Future removeData() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.remove('ip');
@@ -195,7 +172,6 @@ class _MyAppState extends State<MyApp> {
     ));
   }
 
->>>>>>> Stashed changes
   Widget customButton(IconData iconData, Function f) {
     return Container(
       child: RaisedButton(
@@ -214,17 +190,6 @@ class _MyAppState extends State<MyApp> {
   // 连接服务器并发送数据
   Future connectServer(String data) async {
     try {
-<<<<<<< Updated upstream
-      Socket socket = await Socket.connect('192.168.1.102', 8000,
-          timeout: Duration(seconds: 5));
-      print('connected');
-      socket.listen((List<int> event) {
-        print(utf8.decode(event));
-        setState(() {
-          recv = utf8.decode(event);
-          timeNow = DateUtil.formatDate(DateTime.now(), format: "HH:mm:ss");
-          print(timeNow);
-=======
       if (_ip != null) {
         Socket socket = await Socket.connect('$_ip', int.parse(_port),
             timeout: Duration(seconds: 5));
@@ -236,7 +201,6 @@ class _MyAppState extends State<MyApp> {
             timeNow = DateUtil.formatDate(DateTime.now(), format: "HH:mm:ss");
             print(timeNow);
           });
->>>>>>> Stashed changes
         });
 
         if (data != null) {
