@@ -1,9 +1,11 @@
+import 'package:car/data_operation.dart';
 import 'package:flustars/flustars.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   SystemChrome.setPreferredOrientations(
@@ -19,18 +21,31 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => _MyAppState();
 }
 
-
 class _MyAppState extends State<MyApp> {
   String recv = '';
   String timeNow = '';
+  String _ip = '192.168.4.1';
+  String _port = '8000';
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  Future readData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    setState(() {
+      _ip = preferences.get('ip');
+      _port = preferences.get('port');
+      print('读取到ip为:$_ip');
+      print('读取到port为:$_port');
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     recv = '暂无数据';
     timeNow = DateUtil.formatDate(DateTime.now(), format: "HH:mm:ss");
+    readData();
   }
 
   @override
@@ -107,19 +122,32 @@ class _MyAppState extends State<MyApp> {
   Widget _myPopMenu() {
     return PopupMenuButton<String>(
         itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
-              PopupMenuItem<String>(value: 'addConfig', child: new Text('添加配置')),
-              PopupMenuItem<String>(value: 'removeConfig', child: new Text('删除配置')),
+              PopupMenuItem<String>(
+                  value: 'addConfig', child: new Text('添加配置')),
+              PopupMenuItem<String>(
+                  value: 'removeConfig', child: new Text('删除配置')),
             ],
         onSelected: (String value) {
-          if (value == 'addConfig')
-          {
-            print('add');
-          }
-          else if (value == 'removeConfig')
-          {
+          if (value == 'addConfig') {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) => DataOperationPage()));
+                readData();
+          } else if (value == 'removeConfig') {
+            removeData();
             print('remove');
           }
         });
+  }
+
+  Future removeData() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.remove('userName');
+    preferences.remove('password');
+    print('删除acount成功');
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      content: Text('配置已删除'),
+      duration: Duration(seconds: 1),
+    ));
   }
 
   Widget customButton(IconData iconData, Function f) {
@@ -139,7 +167,7 @@ class _MyAppState extends State<MyApp> {
 
   Future connectServer(String data) async {
     try {
-      Socket socket = await Socket.connect('192.168.1.102', 8000,
+      Socket socket = await Socket.connect('$_ip', int.parse(_port),
           timeout: Duration(seconds: 5));
       print('connected');
       socket.listen((List<int> event) {
